@@ -19,10 +19,11 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         stage.setResizable(false);
         
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(this.getClass().getResource("/fxml/primary.fxml"));
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(this.getClass().getResource("/fxml/primary.fxml"));
         
-        StackPane stackPane = fxmlLoader.load();
+        StackPane stackPane = loader.load();
+
         scene = new Scene(stackPane);
 
         stage.setScene(scene);

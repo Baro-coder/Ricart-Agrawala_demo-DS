@@ -1,24 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
 
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="762.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sr.wat.edu.pl.controllers.PrimaryController">
    <children>
@@ -50,25 +43,19 @@
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <StackPane prefHeight="550.0" prefWidth="250.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-                                       <children>
-                                          <VBox prefHeight="200.0" prefWidth="100.0">
-                                             <StackPane.margin>
-                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                                             </StackPane.margin>
-                                             <children>
-                                                <TextArea prefHeight="40.0" prefWidth="200.0" promptText="port" />
-                                             </children>
-                                          </VBox>
-                                       </children>
-                                    </StackPane>
+                                    <StackPane fx:id="netStackPane" prefHeight="581.0" prefWidth="250.0" />
+                                    <fx:include fx:id="netSettings" source="include/netSettings.fxml" />
                                  </children>
                               </AnchorPane>
                            </content>
                         </Tab>
                         <Tab text="System">
                            <content>
-                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <StackPane prefHeight="581.0" prefWidth="250.0" />
+                                    <fx:include fx:id="sysSettings" source="include/sysSettings.fxml" />
+                                 </children></AnchorPane>
                            </content>
                         </Tab>
                      </tabs>
@@ -80,11 +67,7 @@
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <StackPane prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-                                       <children>
-                                          <Canvas height="500.0" width="400.0" />
-                                       </children>
-                                    </StackPane>
+                                    <StackPane prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
                                  </children>
                               </AnchorPane>
                            </content>
@@ -93,11 +76,7 @@
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <StackPane prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-                                       <children>
-                                          <TextArea prefHeight="200.0" prefWidth="200.0" />
-                                       </children>
-                                    </StackPane>
+                                    <StackPane prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
                                  </children>
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -108,30 +87,19 @@
                      </tabs>
                   </TabPane>
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
-                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0">
+                  <StackPane prefHeight="700.0" prefWidth="200.0">
                      <children>
-                        <Label text="Params">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Label>
-                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <fx:include fx:id="ctlPanel" source="include/ctlPanel.fxml" />
                      </children>
-                  </VBox>
+                  </StackPane>
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
-            <GridPane>
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-            </GridPane>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </HBox>
          </children>
       </VBox>
    </children>
