@@ -1,5 +1,7 @@
 # Ricart-Agrawala_demo-DS
 
+![app-banner](docs/assets/app-banner.png)
+
 ## *Ricart-Agrawala algorithm - distributed system demostration*
 
 ## **Content**
@@ -32,11 +34,11 @@
 
 ### Description
 
-A student project from the "Distributed Systems" course, implementing the Ricart and Agrawal algorithm in Java. This algorithm is employed to achieve mutual exclusion (mutex) in distributed environments where multiple processes share resources.
+A ***Military University of Technology*** student project from the ***Distributed Systems*** course, implementing the **Ricart and Agrawala** algorithm in **Java**. This algorithm is employed to achieve mutual exclusion (mutex) in distributed environments where multiple processes share resources.
 
 ### Features
 
-1. Implementation of the Ricart and Agrawal algorithm in **Java**.
+1. Implementation of the Ricart and Agrawala algorithm in **Java**.
 2. Graphical User Interface developed with **JavaFX** framework.
 3. Demonstration of mutual exclusion mechanism in distributed systems.
 4. Sample use cases illustrating process synchronization.
@@ -50,7 +52,9 @@ A student project from the "Distributed Systems" course, implementing the Ricart
 
 ### Screenshots
 
-> *Not uploaded yet...*
+![App-main-screen](docs/assets/app-screen.png)
+
+> Application main window - *SceneBuilder* screenshot
 
 ---
 
