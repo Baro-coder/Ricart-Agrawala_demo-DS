@@ -2,9 +2,12 @@ package sr.wat.edu.pl.core.net;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import sr.wat.edu.pl.core.Logger;
+import sr.wat.edu.pl.core.sys.RaSystem;
 
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 
 public class NetManager {
@@ -29,9 +32,8 @@ public class NetManager {
     private boolean autoHealthcheck;
     private int healthcheckPeriod;
 
+    private RaSystem raSystem;
 
-    private UDPMulticastServer udpMulticastServer;
-    private UDPMulticastClient udpMulticastClient;
 
     // Constructor
     public NetManager() {
@@ -42,8 +44,7 @@ public class NetManager {
         autoHealthcheck = true;
         healthcheckPeriod = 30;
 
-        udpMulticastClient = new UDPMulticastClient();
-        udpMulticastServer = new UDPMulticastServer();
+        raSystem = new RaSystem();
     }
 
     // Interfaces log print
@@ -62,6 +63,7 @@ public class NetManager {
     }
 
     public void updateInterfacesList() {
+        Logger.log_info(this.getClass().getSimpleName(), "Updating interface list...");
         interfaces.clear();
 
         try {
@@ -73,7 +75,14 @@ public class NetManager {
                 
                 String name = networkInterface.getDisplayName();
                 if (name != null && networkInterface.supportsMulticast()) {
-                    interfacesList.add(new NetInterface(name, true));
+
+                    List<InterfaceAddress> intfAddresses = networkInterface.getInterfaceAddresses();
+                    InterfaceAddress intf = intfAddresses.get(intfAddresses.size() - 1);
+
+                    String address = intf.getAddress().getHostAddress();
+                    int maskLength = intf.getNetworkPrefixLength();
+
+                    interfacesList.add(new NetInterface(name, address, maskLength, true));
                 }
             }
 
@@ -81,6 +90,8 @@ public class NetManager {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            Logger.log_info(this.getClass().getSimpleName(), "Interface list: " + showInterfaces());
         }
     }
 
@@ -103,6 +114,10 @@ public class NetManager {
         return null;
     }
 
+    public NetInterface getActiveInterface() {
+        return activeNetInterface;
+    }
+
     public void setActiveInterface(NetInterface obj) {
         if(obj != null){
             if ((activeNetInterface != null && !activeNetInterface.equals(obj)) || activeNetInterface == null) {
@@ -111,8 +126,7 @@ public class NetManager {
                 Logger.log_info(this.getClass().getSimpleName(), "Active interface -> " + activeNetInterface.getName());
                 Logger.log_debug(this.getClass().getSimpleName(), "Interfaces: " + showInterfaces());
         
-                udpMulticastServer.setNetInterface(activeNetInterface);
-                udpMulticastClient.setNetInterface(activeNetInterface);
+                raSystem.setInterfaceName(activeNetInterface.getName());
             }
         }
     }

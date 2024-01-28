@@ -1,4 +1,4 @@
-package sr.wat.edu.pl.core.net;
+package sr.wat.edu.pl.core.sys.com;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -7,14 +7,15 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
+
 public class UDPMulticastClient {
-    private NetInterface netInterface;
+    private String interfaceName;
     private String groupAddress;
     private int port;
 
 
     public UDPMulticastClient() {
-        netInterface = null;
+        interfaceName = null;
         groupAddress = null;
         port = -1;
     }
@@ -29,10 +30,10 @@ public class UDPMulticastClient {
     }
 
     public void sendUDPMessage(String message) throws NullPointerException, IOException {
-        if (netInterface == null) {
+        if (interfaceName == null) {
             throw new NullPointerException("netInterface is unset!");
         }
-        NetworkInterface networkInterface = NetworkInterface.getByName(netInterface.getName());
+        NetworkInterface networkInterface = NetworkInterface.getByName(interfaceName);
         InetAddress interfaceAddress = getInetAddressForNetworkInterface(networkInterface);
 
         if (groupAddress == null || port == -1) {
@@ -46,8 +47,8 @@ public class UDPMulticastClient {
         socket.send(packet);
     }
     
-    public void setNetInterface(NetInterface netInterface) {
-        this.netInterface = netInterface;
+    public void setInterfaceName(String interfaceName) {
+        this.interfaceName = interfaceName;
     }
 
     public void setGroupAddress(String groupAddress) {

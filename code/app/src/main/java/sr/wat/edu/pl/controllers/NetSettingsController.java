@@ -77,7 +77,9 @@ public class NetSettingsController {
         interfaceComboBox.valueProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                handleInterfaceComboBoxChange(newValue);
+                if (!oldValue.equals(newValue)) {
+                    handleInterfaceComboBoxChange(newValue);
+                }
             }
         });
         if (interfaceComboBox.getItems().isEmpty()) {
@@ -142,6 +144,8 @@ public class NetSettingsController {
             interfaceErrorLabel.setText("");
             netManager.setActiveInterface(selectedInterface);
         }
+
+        StatusPanelController.getInstance().setInterfaceInfo(selectedInterface.getName(), selectedInterface.getAddress(), selectedInterface.getMaskLength());
     }
 
     // Buttons onAction
@@ -158,12 +162,16 @@ public class NetSettingsController {
 
     @FXML
     private void applySettings() {
+        String multicastGroupAddress = "-";
+        int multicastGroupPort = -1;
+
         if (aAddressTextField.getText().isBlank() || bAddressTextField.getText().isBlank() || cAddressTextField.getText().isBlank() || dAddressTextField.getText().isBlank()) {
             addressErrorLabel.setText("Required fields!");
         } else {
             try {
                 netManager.setMulticastGroupAddress(aAddressTextField.getText(), bAddressTextField.getText(), cAddressTextField.getText(), dAddressTextField.getText());
                 addressErrorLabel.setText("");
+                multicastGroupAddress = String.format("%s.%s.%s.%s", aAddressTextField.getText(), bAddressTextField.getText(), cAddressTextField.getText(), dAddressTextField.getText());
             } catch (Exception e) {
                 addressErrorLabel.setText(e.getMessage());
             }
@@ -176,11 +184,14 @@ public class NetSettingsController {
             try {
                 netManager.setMulticastGroupPort(port);
                 portErrorLabel.setText("");
+                multicastGroupPort = port;
             } catch (Exception e) {
                 portErrorLabel.setText(e.getMessage());
             }
         }
-
+        
         netManager.setHealthcheckPeriod(healthcheckPeriodSlider.valueProperty().getValue().intValue());
+
+        StatusPanelController.getInstance().setMulticastGroupInfo(multicastGroupAddress, multicastGroupPort);
     }
 }

@@ -84,6 +84,9 @@
                                              <cursor>
                                                 <Cursor fx:constant="TEXT" />
                                              </cursor>
+                                             <font>
+                                                <Font name="Monospaced Italic" size="10.0" />
+                                             </font>
                                           </TextArea>
                                        </children></StackPane>
                                  </children>
@@ -104,11 +107,14 @@
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
-            <HBox prefHeight="100.0" prefWidth="200.0">
+            <StackPane prefHeight="150.0" prefWidth="200.0">
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
-            </HBox>
+               <children>
+                  <fx:include source="include/statusPanel.fxml" />
+               </children>
+            </StackPane>
          </children>
       </VBox>
    </children>

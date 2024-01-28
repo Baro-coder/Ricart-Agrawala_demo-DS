@@ -2,7 +2,6 @@ package sr.wat.edu.pl.controllers;
 
 import javafx.fxml.FXML;
 
-
 public class CtlPanelController {
 
     public CtlPanelController() {
