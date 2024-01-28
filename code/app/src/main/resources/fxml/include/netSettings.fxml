@@ -1,40 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="570.0" prefWidth="240.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sr.wat.edu.pl.controllers.NetSettingsController">
    <children>
-      <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0">
+      <VBox minHeight="-Infinity" prefHeight="570.0" prefWidth="100.0" spacing="2.0">
          <StackPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </StackPane.margin>
          <children>
-            <VBox alignment="CENTER" prefHeight="70.0" prefWidth="100.0">
+            <VBox alignment="CENTER" prefHeight="70.0" prefWidth="100.0" spacing="5.0">
                <children>
                   <HBox alignment="CENTER" prefHeight="60.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Label text="Interface:" />
-                        <ComboBox prefWidth="120.0">
+                        <ComboBox fx:id="interfaceComboBox" prefWidth="120.0">
                            <HBox.margin>
                               <Insets right="20.0" />
                            </HBox.margin>
                         </ComboBox>
                      </children>
                   </HBox>
-                  <Label text="*" textFill="RED" />
+                  <Label fx:id="interfaceErrorLabel" text="*" textFill="RED" />
                </children>
             </VBox>
             <Separator prefWidth="200.0" />
-            <VBox alignment="CENTER" prefHeight="80.0" prefWidth="100.0" spacing="15.0">
+            <VBox alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="150.0" prefWidth="100.0">
                <children>
-                  <Label text="Multicast group address:" />
+                  <Label text="Multicast group address" />
                   <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0">
                      <children>
                         <TextField fx:id="aAddressTextField" prefWidth="50.0" />
@@ -46,26 +51,77 @@
                         <TextField fx:id="dAddressTextField" prefWidth="50.0" />
                      </children>
                   </HBox>
-                  <Label text="*" textFill="RED" />
+                  <Label fx:id="addressErrorLabel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" text="*" textAlignment="CENTER" textFill="RED" wrapText="true" />
                </children>
             </VBox>
             <Separator prefWidth="200.0" />
-            <VBox alignment="CENTER" prefHeight="80.0" prefWidth="100.0" spacing="10.0">
+            <VBox alignment="CENTER" minHeight="-Infinity" prefHeight="150.0" prefWidth="100.0">
                <children>
-                  <Label text="Port:" />
-                  <TextField fx:id="portTextField" cache="true" depthTest="ENABLE" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="60.0" />
-                  <Label text="*" textFill="RED" />
+                  <Label text="Port" />
+                  <TextField fx:id="portTextField" cache="true" depthTest="ENABLE" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="60.0">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin></TextField>
+                  <Label fx:id="portErrorLabel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" text="*" textFill="RED" wrapText="true" />
                </children>
             </VBox>
             <Separator prefWidth="200.0" />
-            <VBox prefHeight="200.0" prefWidth="100.0" />
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+               <children>
+                  <Label text="Healthcheck" />
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <Label text="Auto Period [s]: ">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="healthcheckPeriodLabel" text="00" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <Slider fx:id="healthcheckPeriodSlider" blockIncrement="1.0" majorTickUnit="6.0" max="30.0" maxWidth="-Infinity" min="1.0" minorTickCount="5" prefWidth="180.0" showTickMarks="true" value="5.0" />
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                     <children>
+                        <Label text="Mode:">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <RadioButton fx:id="healthcheckManualRadioButton" mnemonicParsing="false" text="Manual">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                           <toggleGroup>
+                              <ToggleGroup fx:id="healthcheckModeToggleGroup" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="healthcheckAutoRadioButton" mnemonicParsing="false" selected="true" text="Auto" toggleGroup="$healthcheckModeToggleGroup">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                        </RadioButton>
+                     </children>
+                  </HBox>
+               </children></VBox>
             <Separator prefWidth="200.0" />
-            <VBox prefHeight="200.0" prefWidth="100.0" />
-            <Separator prefWidth="200.0" />
-            <VBox prefHeight="200.0" prefWidth="100.0" />
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+               <children>
+                  <Button fx:id="resetButton" mnemonicParsing="false" onAction="#resetSettings" prefWidth="80.0" text="Reset" />
+                  <Button fx:id="applyButton" mnemonicParsing="false" onAction="#applySettings" prefWidth="80.0" text="Apply" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets top="10.0" />
+               </padding>
+            </HBox>
          </children>
          <padding>
-            <Insets bottom="40.0" left="5.0" right="5.0" top="40.0" />
+            <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
          </padding>
       </VBox>
    </children>

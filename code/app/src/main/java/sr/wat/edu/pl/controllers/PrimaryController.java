@@ -1,21 +1,19 @@
 package sr.wat.edu.pl.controllers;
 
-
-import java.io.IOException;
-
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.StackPane;
 
 
 public class PrimaryController {
+    private static PrimaryController instance;
 
-    @FXML
-    private NetSettingsController netSettingsController;
-    @FXML
-    private SysSettingsController sysSettingsController;
-    @FXML
-    private CtlPanelController ctlPanelController;
+    public static PrimaryController getInstance() {
+        if (instance == null) {
+            instance = new PrimaryController();
+        }
+        return instance;
+    }
 
     @FXML
     private StackPane netSettings;
@@ -24,15 +22,20 @@ public class PrimaryController {
     @FXML
     private StackPane ctlPanel;
 
+    @FXML
+    private TextArea logTextArea;
+
 
     public PrimaryController() {
-        System.out.println("NetSettingsController   [" + netSettingsController + "] : from primary");
-        System.out.println("SysSettingsController   [" + sysSettingsController + "] : from primary");
-        System.out.println("CtlPanelController      [" + ctlPanelController + "] : from primary");
+
     }
 
     @FXML
     private void initialize() {
+        instance = this;
+    }
 
+    public void appendLog(String log) {
+        logTextArea.appendText(log + "\n");
     }
 }
