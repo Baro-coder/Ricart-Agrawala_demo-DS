@@ -90,7 +90,7 @@
                               <Font size="12.0" />
                            </font>
                         </Label>
-                        <RadioButton fx:id="healthcheckManualRadioButton" mnemonicParsing="false" text="Manual">
+                        <RadioButton fx:id="healthcheckManualRadioButton" mnemonicParsing="false" selected="true" text="Manual">
                            <font>
                               <Font size="11.0" />
                            </font>
@@ -98,7 +98,7 @@
                               <ToggleGroup fx:id="healthcheckModeToggleGroup" />
                            </toggleGroup>
                         </RadioButton>
-                        <RadioButton fx:id="healthcheckAutoRadioButton" mnemonicParsing="false" selected="true" text="Auto" toggleGroup="$healthcheckModeToggleGroup">
+                        <RadioButton fx:id="healthcheckAutoRadioButton" mnemonicParsing="false" text="Auto" toggleGroup="$healthcheckModeToggleGroup">
                            <font>
                               <Font size="11.0" />
                            </font>
@@ -109,11 +109,7 @@
             <Separator prefWidth="200.0" />
             <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
                <children>
-                  <Button fx:id="resetButton" mnemonicParsing="false" onAction="#resetSettings" prefWidth="80.0" text="Reset">
-                     <HBox.margin>
-                        <Insets bottom="5.0" />
-                     </HBox.margin></Button>
-                  <Button fx:id="applyButton" mnemonicParsing="false" onAction="#applySettings" prefWidth="80.0" text="Apply">
+                  <Button fx:id="applyButton" defaultButton="true" mnemonicParsing="false" onAction="#applySettings" prefWidth="80.0" text="Apply">
                      <HBox.margin>
                         <Insets bottom="5.0" />
                      </HBox.margin></Button>

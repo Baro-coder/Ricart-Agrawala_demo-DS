@@ -36,10 +36,6 @@ public class StatusPanelController {
     @FXML
     private void initialize() {
         instance = this;
-        
-        // Network config
-        netInterfaceInfoLabel.setText("-");
-        multicastGroupInfoLabel.setText("-");
 
         // Node status
         statusLabel.setText("Init...");

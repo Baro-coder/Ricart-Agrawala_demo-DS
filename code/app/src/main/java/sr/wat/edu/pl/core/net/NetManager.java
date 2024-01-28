@@ -41,10 +41,10 @@ public class NetManager {
         activeNetInterface = null;
         multicastGroupAddress = null;
         multicastGroupPort = -1;
-        autoHealthcheck = true;
+        autoHealthcheck = false;
         healthcheckPeriod = 30;
 
-        raSystem = new RaSystem();
+        raSystem = RaSystem.getInstance();
     }
 
     // Interfaces log print
@@ -123,7 +123,6 @@ public class NetManager {
             if ((activeNetInterface != null && !activeNetInterface.equals(obj)) || activeNetInterface == null) {
                 activeNetInterface = obj;
 
-                Logger.log_info(this.getClass().getSimpleName(), "Active interface -> " + activeNetInterface.getName());
                 Logger.log_debug(this.getClass().getSimpleName(), "Interfaces: " + showInterfaces());
         
                 raSystem.setInterfaceName(activeNetInterface.getName());
@@ -157,6 +156,7 @@ public class NetManager {
         if (multicastGroupAddress == null || !multicastGroupAddress.equals(groupAddress)) {
             multicastGroupAddress = groupAddress;
             Logger.log_info(this.getClass().getSimpleName(), "Multicast group -> " + multicastGroupAddress);
+            raSystem.setMulticastGroupAddress(groupAddress);
         }
     }
 
@@ -168,6 +168,7 @@ public class NetManager {
         if (multicastGroupPort != port) {
             multicastGroupPort = port;
             Logger.log_info(this.getClass().getSimpleName(), "Multicast port ->  " + String.valueOf(multicastGroupPort));
+            raSystem.setMulticastGroupPort(port);
         }
     }
 

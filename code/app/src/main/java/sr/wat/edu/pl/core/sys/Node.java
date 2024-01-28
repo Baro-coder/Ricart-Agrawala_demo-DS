@@ -1,14 +1,33 @@
 package sr.wat.edu.pl.core.sys;
 
 public class Node {
-    private String id;
-
-    public Node(String id) {
-        this.id = id;
+    public enum NodeState {
+        NOT_READY,
+        READY,
+        IDLE,
+        WAITING,
+        WORKING
     }
 
 
-    public String getId() {
+    private int id;
+    private NodeState state;
+
+    public Node(int id) {
+        this.id = id;
+        state = NodeState.NOT_READY;
+    }
+
+
+    public int getId() {
         return id;
+    }
+
+    public NodeState getState() {
+        return state;
+    }
+
+    public void setState(NodeState state) {
+        this.state = state;
     }
 }

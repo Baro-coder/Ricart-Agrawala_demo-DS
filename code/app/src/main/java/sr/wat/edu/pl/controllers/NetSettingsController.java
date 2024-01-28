@@ -16,7 +16,15 @@ import sr.wat.edu.pl.core.net.NetManager;
 
 
 public class NetSettingsController {
+    private static NetSettingsController instance;
 
+    public static NetSettingsController getInstance() {
+        if (instance == null) {
+            instance = new NetSettingsController();
+        }
+        return instance;
+    }
+    
     // Network Interface
     @FXML
     private ComboBox<String> interfaceComboBox;
@@ -55,9 +63,10 @@ public class NetSettingsController {
 
     // Buttons
     @FXML
-    private Button resetButton;
-    @FXML
     private Button applyButton;
+
+    // Controllers
+    CtlPanelController ctlPanelController;
 
     // Core
     NetManager netManager;
@@ -71,22 +80,21 @@ public class NetSettingsController {
     // FXML Controls init
     @FXML
     private void initialize() {
+        instance = this;
+
         // Network Interface ComboBox init
         netManager.updateInterfacesList();
         interfaceComboBox.getItems().addAll(netManager.getInterfacesNames());
         interfaceComboBox.valueProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (!oldValue.equals(newValue)) {
+                if (oldValue != null && !oldValue.equals(newValue)) {
                     handleInterfaceComboBoxChange(newValue);
                 }
             }
         });
         if (interfaceComboBox.getItems().isEmpty()) {
             interfaceErrorLabel.setText("No available interface!");
-        } else {
-            interfaceComboBox.setValue(interfaceComboBox.getItems().get(0));
-            handleInterfaceComboBoxChange(interfaceComboBox.getValue());
         }
         
 
@@ -148,25 +156,16 @@ public class NetSettingsController {
         StatusPanelController.getInstance().setInterfaceInfo(selectedInterface.getName(), selectedInterface.getAddress(), selectedInterface.getMaskLength());
     }
 
-    // Buttons onAction
-    @FXML
-    private void resetSettings() {
-        aAddressTextField.setText("");
-        bAddressTextField.setText("");
-        cAddressTextField.setText("");
-        dAddressTextField.setText("");
-        portTextField.setText("");
-        addressErrorLabel.setText("");
-        portErrorLabel.setText("");
-    }
-
     @FXML
     private void applySettings() {
+        boolean settingsValid = true;
+
         String multicastGroupAddress = "-";
         int multicastGroupPort = -1;
 
         if (aAddressTextField.getText().isBlank() || bAddressTextField.getText().isBlank() || cAddressTextField.getText().isBlank() || dAddressTextField.getText().isBlank()) {
             addressErrorLabel.setText("Required fields!");
+            settingsValid = false;
         } else {
             try {
                 netManager.setMulticastGroupAddress(aAddressTextField.getText(), bAddressTextField.getText(), cAddressTextField.getText(), dAddressTextField.getText());
@@ -174,11 +173,13 @@ public class NetSettingsController {
                 multicastGroupAddress = String.format("%s.%s.%s.%s", aAddressTextField.getText(), bAddressTextField.getText(), cAddressTextField.getText(), dAddressTextField.getText());
             } catch (Exception e) {
                 addressErrorLabel.setText(e.getMessage());
+                settingsValid = false;
             }
         }
         
         if (portTextField.getText().isBlank()) {
             portErrorLabel.setText("Required field!");
+            settingsValid = false;
         } else {
             int port = Integer.parseInt(portTextField.getText());
             try {
@@ -187,11 +188,39 @@ public class NetSettingsController {
                 multicastGroupPort = port;
             } catch (Exception e) {
                 portErrorLabel.setText(e.getMessage());
+                settingsValid = false;
             }
         }
         
         netManager.setHealthcheckPeriod(healthcheckPeriodSlider.valueProperty().getValue().intValue());
 
         StatusPanelController.getInstance().setMulticastGroupInfo(multicastGroupAddress, multicastGroupPort);
+
+        if (!portTextField.isDisable()) {
+            if (settingsValid && interfaceErrorLabel.getText().isBlank()) {
+                CtlPanelController.getInstance().enableToJoin();
+            } else {
+                CtlPanelController.getInstance().disableToJoin();
+            }
+        }
+    }
+
+
+    public void enableNetworkControls() {
+        interfaceComboBox.setDisable(false);
+        aAddressTextField.setDisable(false);
+        bAddressTextField.setDisable(false);
+        cAddressTextField.setDisable(false);
+        dAddressTextField.setDisable(false);
+        portTextField.setDisable(false);
+    }
+
+    public void disableNetworkControls() {
+        interfaceComboBox.setDisable(true);
+        aAddressTextField.setDisable(true);
+        bAddressTextField.setDisable(true);
+        cAddressTextField.setDisable(true);
+        dAddressTextField.setDisable(true);
+        portTextField.setDisable(true);
     }
 }
