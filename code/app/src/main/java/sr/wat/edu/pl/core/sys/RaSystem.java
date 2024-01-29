@@ -78,6 +78,7 @@ public class RaSystem {
         try {
             nodeIds = udpMulticastClient.sendUDPMessageAndReceiveNodeIds(msg.toString(), MessageType.HELLO);
         } catch (Exception e) {
+            Logger.log_error(this.getClass().getSimpleName(), e.getMessage());
             e.printStackTrace();
         }
 
@@ -96,6 +97,7 @@ public class RaSystem {
         try {
             requests = udpMulticastClient.sendUDPMessageAndReceiveRequestsList(msg.toString(), MessageType.LIST_REPLY);
         } catch (Exception e) {
+            Logger.log_error(this.getClass().getSimpleName(), e.getMessage());
             e.printStackTrace();
         }
 
@@ -119,6 +121,7 @@ public class RaSystem {
         try {
             nodeIds = udpMulticastClient.sendUDPMessageAndReceiveNodeIds(msg.toString(), MessageType.HEALTHCHECK_REPLY);
         } catch (Exception e) {
+            Logger.log_error(this.getClass().getSimpleName(), e.getMessage());
             e.printStackTrace();
         }
 
@@ -158,6 +161,10 @@ public class RaSystem {
 
         udpMulticastServer.start();
 
+        if (autoHealthcheck) {
+            healthcheckDaemon.start();
+        }
+
         Logger.log_info(this.getClass().getSimpleName(), "Joined.");
     }
 
@@ -166,6 +173,9 @@ public class RaSystem {
 
         // Stop Multicast server
         udpMulticastServer.stop();
+
+        // Stop healthcheck daemon
+        healthcheckDaemon.stop();
 
         // BYE send
         Message msg = new Message(MessageType.BYE, localNode.getId());
@@ -444,7 +454,7 @@ public class RaSystem {
     public void setAutoHealthcheck(boolean value) {
         autoHealthcheck = value;
         
-        if (value == true) {
+        if (value == true && localNode.getState() != NodeState.NOT_READY && localNode.getState() != NodeState.READY) {
             // Run background task
             healthcheckDaemon.start();
         } else {

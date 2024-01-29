@@ -75,7 +75,8 @@ public class NetManager {
             while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
                 
-                String name = networkInterface.getDisplayName();
+                String name = networkInterface.getName();
+
                 if (name != null && networkInterface.isUp() && networkInterface.supportsMulticast()) {
 
                     List<InterfaceAddress> intfAddresses = networkInterface.getInterfaceAddresses();

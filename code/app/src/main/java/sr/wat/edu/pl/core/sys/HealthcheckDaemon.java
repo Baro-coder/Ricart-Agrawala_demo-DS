@@ -14,30 +14,34 @@ public class HealthcheckDaemon extends Task<Void> {
 
     @Override
     protected Void call() throws Exception {
-        
+        Thread.sleep(1000);
+
         try {
             while(!Thread.interrupted()) {
                 RaSystem.getInstance().sendHealthcheck();
                 Thread.sleep(period);        
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.log_debug(this.getClass().getSimpleName(), "Healthcheck daemon interrupted.");
         }
         
         return null;
     }
     
     public void start() {
-        thread = new Thread(this);
-        thread.start();
-
-        Logger.log_info(this.getClass().getSimpleName(), "Healthcheck daemon started.");
+        if (thread == null) {
+            thread = new Thread(this);
+            thread.start();
+            Logger.log_info(this.getClass().getSimpleName(), "Healthcheck daemon started.");
+        }
     }
 
     public void stop() {
-        thread.interrupt();
-
-        Logger.log_info(this.getClass().getSimpleName(), "Healthcheck daemon stoped.");
+        if (thread != null) {
+            thread.interrupt();
+            Logger.log_info(this.getClass().getSimpleName(), "Healthcheck daemon stoped.");
+            thread = null;
+        }
     }
 
 

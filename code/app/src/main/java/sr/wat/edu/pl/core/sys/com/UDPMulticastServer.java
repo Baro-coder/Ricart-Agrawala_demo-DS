@@ -10,6 +10,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import sr.wat.edu.pl.core.Logger;
 import sr.wat.edu.pl.core.sys.Node;
@@ -37,7 +38,9 @@ public class UDPMulticastServer extends Task<Void> {
         try {
             group = InetAddress.getByName(address);
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            Platform.runLater(() -> {
+                Logger.log_error(this.getClass().getSimpleName(), e.getMessage()); 
+            });
         }
 
         InetSocketAddress sockaddr = new InetSocketAddress(group, port);
@@ -48,7 +51,9 @@ public class UDPMulticastServer extends Task<Void> {
         try {
             networkInterface = NetworkInterface.getByName(interfaceName);
         } catch (SocketException e) {
-            e.printStackTrace();
+            Platform.runLater(() -> {
+                Logger.log_error(this.getClass().getSimpleName(), e.getMessage()); 
+            });
         }
 
         try {
@@ -135,10 +140,11 @@ public class UDPMulticastServer extends Task<Void> {
         } finally {
             if (socket != null && !socket.isClosed()) {
                 try {
-                    // Opuść grupę multicastową przed zamknięciem socketu
                     socket.leaveGroup(sockaddr, networkInterface);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Platform.runLater(() -> {
+                        Logger.log_error(this.getClass().getSimpleName(), e.getMessage()); 
+                    });
                 }
         
                 socket.close();
