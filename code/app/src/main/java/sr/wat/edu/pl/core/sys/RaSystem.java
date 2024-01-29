@@ -65,7 +65,6 @@ public class RaSystem {
             udpMulticastClient.sendUDPMessage(message.toString());
         } catch (Exception e) {
             Logger.log_error(this.getClass().getSimpleName(), e.getMessage());
-            Logger.log_error(this.getClass().getSimpleName(), interfaceName);
         }
     }
 
@@ -75,7 +74,7 @@ public class RaSystem {
         Message msg = new Message(MessageType.DISCOVER, localNode.getId());
 
         try {
-            nodeIds = udpMulticastClient.sendUDPMessageAndReceiveHelloResponsedNodeIds(msg.toString(), MessageType.HELLO);
+            nodeIds = udpMulticastClient.sendUDPMessageAndReceiveNodeIds(msg.toString(), MessageType.HELLO);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,7 +92,7 @@ public class RaSystem {
         Message msg = new Message(MessageType.LIST_REQUEST, localNode.getId());
 
         try {
-            requests = udpMulticastClient.sendUDPMessageAndReceiveListResponsedNodeIds(msg.toString(), MessageType.LIST_REPLY);
+            requests = udpMulticastClient.sendUDPMessageAndReceiveRequestsList(msg.toString(), MessageType.LIST_REPLY);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,6 +109,27 @@ public class RaSystem {
         }
     }
 
+    private void performHealthcheck() {
+        ArrayList<Integer> nodeIds = new ArrayList<>();
+
+        Message msg = new Message(MessageType.HEALTHCHECK_REQUEST, localNode.getId());
+
+        try {
+            nodeIds = udpMulticastClient.sendUDPMessageAndReceiveNodeIds(msg.toString(), MessageType.HEALTHCHECK_REPLY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.err.println(" [+!+] HEALTHCHECK REPLIES: " + String.valueOf(nodeIds.size()) + " / " + String.valueOf(nodes.size()));
+
+        if (nodes.size() != nodeIds.size()) {
+            for (Node node : nodes) {
+                if (!nodeIds.contains(node.getId())) {
+                    removeNodeById(node.getId());
+                }
+            }
+        }
+    }
 
     public void joinSystem() {
         Logger.log_info(this.getClass().getSimpleName(), "Joining system...");
@@ -169,6 +189,7 @@ public class RaSystem {
         Logger.log_info(this.getClass().getSimpleName(), "System left.");
     }
 
+
     public void sendRequest() {
         sendMessage(MessageType.REQUEST);
         localNode.setState(NodeState.WAITING);
@@ -177,13 +198,31 @@ public class RaSystem {
 
     public void sendResponse() {
         sendMessage(MessageType.RESPONSE);
-        localNode.setState(NodeState.IDLE);
-        StatusPanelController.getInstance().setState(localNode.getState());
+
+        for (Message req : requests) {
+            if (req.getNodeId() == localNode.getId()) {
+                PrimaryController.getInstance().removeRequestByIndex(requests.indexOf(req));
+                requests.remove(req);
+                break;
+            }
+        }
+
+        if (!isLocalNodeInQueue()) {
+            localNode.setState(NodeState.IDLE);
+            StatusPanelController.getInstance().setState(localNode.getState());
+        } else if (hasAccesss()) {
+            localNode.setState(NodeState.WORKING);
+            StatusPanelController.getInstance().setState(localNode.getState());
+        } else {
+            localNode.setState(NodeState.WAITING);
+            StatusPanelController.getInstance().setState(localNode.getState());
+        }
     }
 
     public void sendHealthcheck() {
-        sendMessage(MessageType.HEALTHCHECK_REQUEST);
+        performHealthcheck();
     }
+
 
     private String showRequests() {
         StringBuilder builder = new StringBuilder();
@@ -198,9 +237,11 @@ public class RaSystem {
     }
 
     private boolean isLocalNodeInQueue() {
-        for(Message request : requests) {
-            if (request.getNodeId() == localNode.getId()) {
-                return true;
+        if (!requests.isEmpty()) {
+            for(Message request : requests) {
+                if (request.getNodeId() == localNode.getId()) {
+                    return true;
+                }
             }
         }
         return false;
@@ -242,6 +283,15 @@ public class RaSystem {
     }
 
 
+    public boolean hasAccesss() {
+        if (!requests.isEmpty()) {
+            if (requests.get(0).getNodeId() == localNode.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void handleRequest(Message request) {
         Platform.runLater(() -> {
             boolean inserted = false;
@@ -267,10 +317,29 @@ public class RaSystem {
 
             if (!isLocalNodeInQueue()) {
                 sendResponse();
+            } else if (hasAccesss()) {
+                localNode.setState(NodeState.WORKING);
+                StatusPanelController.getInstance().setState(localNode.getState());
             }
         });
     }
 
+    public void handleResponse(Message response) {
+        Platform.runLater(() -> {
+            for (Message req : requests) {
+                if (req.getNodeId() == response.getNodeId()) {
+                    PrimaryController.getInstance().removeRequestByIndex(requests.indexOf(req));
+                    requests.remove(req);
+                    break;
+                }
+            }
+
+            if (hasAccesss()) {
+                localNode.setState(NodeState.WORKING);
+                StatusPanelController.getInstance().setState(localNode.getState());
+            }
+        });
+    }
 
     public ArrayList<Node> getNodes() {
         return nodes;
@@ -295,6 +364,20 @@ public class RaSystem {
                 removeNode(node);
 
                 Logger.log_info(this.getClass().getSimpleName(), "Removed node : " + node);
+
+                Platform.runLater(() -> {
+                    if (!isLocalNodeInQueue()) {
+                        localNode.setState(NodeState.IDLE);
+                        StatusPanelController.getInstance().setState(localNode.getState());
+                    } else if (hasAccesss()) {
+                        localNode.setState(NodeState.WORKING);
+                        StatusPanelController.getInstance().setState(localNode.getState());
+                    } else {
+                        localNode.setState(NodeState.WAITING);
+                        StatusPanelController.getInstance().setState(localNode.getState());
+                    }
+                });
+                
                 break;
             }
         }

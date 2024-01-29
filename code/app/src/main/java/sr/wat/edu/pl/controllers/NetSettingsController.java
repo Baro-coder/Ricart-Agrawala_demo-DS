@@ -191,13 +191,18 @@ public class NetSettingsController {
                 settingsValid = false;
             }
         }
+
+        if (!interfaceErrorLabel.getText().isBlank()) {
+            interfaceErrorLabel.setText("Required selection!");
+            settingsValid = false;
+        }
         
         netManager.setHealthcheckPeriod(healthcheckPeriodSlider.valueProperty().getValue().intValue());
 
         StatusPanelController.getInstance().setMulticastGroupInfo(multicastGroupAddress, multicastGroupPort);
 
         if (!portTextField.isDisable()) {
-            if (settingsValid && interfaceErrorLabel.getText().isBlank()) {
+            if (settingsValid) {
                 CtlPanelController.getInstance().enableToJoin();
             } else {
                 CtlPanelController.getInstance().disableToJoin();

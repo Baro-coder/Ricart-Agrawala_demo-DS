@@ -18,7 +18,7 @@ import sr.wat.edu.pl.core.sys.com.Message.MessageType;
 
 
 public class UDPMulticastServer extends Task<Void> {
-    private boolean isRunning;
+    private Thread thread;
 
     private String interfaceName;
     private String address;
@@ -26,8 +26,6 @@ public class UDPMulticastServer extends Task<Void> {
 
 
     public UDPMulticastServer() {
-        isRunning = false;
-
         interfaceName = null;
         address = null;
         port = -1;
@@ -35,8 +33,6 @@ public class UDPMulticastServer extends Task<Void> {
 
     @Override
     protected Void call() throws Exception {
-        isRunning = true;
-
         InetAddress group = null;
         try {
             group = InetAddress.getByName(address);
@@ -62,7 +58,7 @@ public class UDPMulticastServer extends Task<Void> {
             
             Logger.log_debug(this.getClass().getSimpleName(), String.format("Socket [%s:%d] opened.", address, port));
 
-            while (isRunning) {
+            while (!Thread.interrupted()) {
                 // Prepare packet to being received
                 byte[] receiveData = new byte[1024];
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -104,8 +100,9 @@ public class UDPMulticastServer extends Task<Void> {
                                 RaSystem.getInstance().handleRequest(raMsg);
                             break;
                         case RESPONSE:
-                                // TODO: Check the list
-                                // -- and ignore;
+                                if (raMsg.getNodeId() != RaSystem.getInstance().getLocalNode().getId()) {
+                                    RaSystem.getInstance().handleResponse(raMsg);
+                                }
                             break;
                         default:
                             break;
@@ -152,14 +149,14 @@ public class UDPMulticastServer extends Task<Void> {
     }
 
     public void start() {
-        Thread thread = new Thread(this);
+        thread = new Thread(this);
         thread.start();
 
         Logger.log_info(this.getClass().getSimpleName(), String.format("Listening at [%s] %s:%d ...", interfaceName, address, port));
     }
 
     public void stop() {
-        isRunning = false;
+        thread.interrupt();
         Logger.log_info(this.getClass().getSimpleName(), "Listening stoped.");
     }
 

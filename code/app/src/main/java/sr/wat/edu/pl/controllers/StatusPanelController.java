@@ -80,7 +80,7 @@ public class StatusPanelController {
                     stateDiode.setFill(Color.BLUE);
                     break;
                 case WAITING:
-                    // setStatus("Waiting for access.");
+                    setStatus("Waiting for access.");
                     stateDiode.setFill(Color.YELLOW);
                     break;
                 case WORKING:

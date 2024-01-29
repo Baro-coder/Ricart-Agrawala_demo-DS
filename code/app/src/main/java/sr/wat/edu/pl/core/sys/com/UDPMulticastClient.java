@@ -55,7 +55,7 @@ public class UDPMulticastClient {
         socket.close();
     }
 
-    public ArrayList<Integer> sendUDPMessageAndReceiveHelloResponsedNodeIds(String message, MessageType expectedResponseType) throws NullPointerException, IOException {
+    public ArrayList<Integer> sendUDPMessageAndReceiveNodeIds(String message, MessageType expectedResponseType) throws NullPointerException, IOException {
         if (interfaceName == null) {
             throw new NullPointerException("netInterface is unset!");
         }
@@ -104,7 +104,7 @@ public class UDPMulticastClient {
         return nodeIds;
     }
 
-    public ArrayList<Message> sendUDPMessageAndReceiveListResponsedNodeIds(String message, MessageType expectedResponseType) throws NullPointerException, IOException {
+    public ArrayList<Message> sendUDPMessageAndReceiveRequestsList(String message, MessageType expectedResponseType) throws NullPointerException, IOException {
         if (interfaceName == null) {
             throw new NullPointerException("netInterface is unset!");
         }
