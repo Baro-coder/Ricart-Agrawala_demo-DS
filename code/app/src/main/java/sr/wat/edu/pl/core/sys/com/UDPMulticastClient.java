@@ -24,6 +24,12 @@ public class UDPMulticastClient {
         port = -1;
     }
 
+    public UDPMulticastClient(String interfaceName, String groupAddress, int port) {
+        this.interfaceName = interfaceName;
+        this.groupAddress = groupAddress;
+        this.port = port;
+    }
+
     private static InetAddress getInetAddressForNetworkInterface(NetworkInterface networkInterface) {
         Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
         InetAddress inetAddress = null;

@@ -22,11 +22,11 @@ public class Logger {
         CRITICAL
     }
 
-    private static String FORMAT_STRING = "[%s]\t[%s]\t: [ %-15s] : %s";
+    private static String FORMAT_STRING = "[T%s] : [%-10s] : [ %-12s] : %s";
 
     private static void log(LogLevel level, String subject, String msg) {
         Instant instant = Instant.now();
-        String timestamp = instant.toString();
+        String timestamp = String.valueOf(instant.toEpochMilli());
         String text = String.format(FORMAT_STRING, timestamp, level.toString(), subject, msg);
         System.err.println(text);
         Platform.runLater(() -> {

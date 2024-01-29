@@ -27,6 +27,12 @@
                   </Label>
                   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
+                        <Label alignment="CENTER_RIGHT" minWidth="-Infinity" prefWidth="110.0" text="Node:" />
+                        <Label fx:id="nodeIdLabel" text="-" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                     <children>
                         <Label alignment="CENTER_RIGHT" minWidth="-Infinity" prefWidth="110.0" text="Interface:" />
                         <Label fx:id="netInterfaceInfoLabel" text="-" />
                      </children>

@@ -52,8 +52,6 @@ public class ListMessage extends Message {
             String datagramMsgTimestamp = datagramMsg.substring(_endIndex_timestamp + 1, _endIndex_list);
             String datagramMsgList = datagramMsg.substring(_endIndex_list + 1, datagramMsg.length() - 5);
 
-            Logger.log_debug(Message.class.getSimpleName(), " Received Datagram : " + message);
-
             try {
                 MessageType msgType = MessageType.valueOf(datagramMsgType);
                 int nodeId = Integer.parseInt(datagramMsgNodeId);
@@ -70,6 +68,8 @@ public class ListMessage extends Message {
 
                     requests.add(new Message(MessageType.REQUEST, n, t));
                 }
+
+                Logger.log_debug(Message.class.getSimpleName(), String.format("Received [%s] from Node[%d] : {%s}", msgType.name(), nodeId, records));
 
                 return new ListMessage(msgType, nodeId, timestamp, requests);
 

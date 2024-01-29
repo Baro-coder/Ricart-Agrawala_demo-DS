@@ -66,13 +66,14 @@ public class Message {
             String datagramMsgType = datagramMsg.substring(0, _endIndex_nodeId);
             String datagramMsgNodeId = datagramMsg.substring(_endIndex_nodeId + 8, _endIndex_timestamp);
             String datagramMsgTimestamp = datagramMsg.substring(_endIndex_timestamp + 1, datagramMsg.length() - 5);
-
-            Logger.log_debug(Message.class.getSimpleName(), " Received Datagram : " + message);
             
             try {
                 MessageType msgType = MessageType.valueOf(datagramMsgType);
                 int nodeId = Integer.parseInt(datagramMsgNodeId);
                 int timestamp = Integer.parseInt(datagramMsgTimestamp);
+
+                Logger.log_debug(Message.class.getSimpleName(), String.format("Received [%s] from Node[%d]", msgType.name(), nodeId));
+
                 return new Message(msgType, nodeId, timestamp);
             } catch (Exception ignored) {}
         }

@@ -44,6 +44,7 @@ public class RaSystem {
         nodes = new ArrayList<>();
         localNode = new Node(-1);
         StatusPanelController.getInstance().setState(localNode.getState());
+        StatusPanelController.getInstance().setNodeId(localNode.getId());
 
         interfaceName = null;
         multicastAddress = null;
@@ -151,6 +152,10 @@ public class RaSystem {
     public void joinSystem() {
         Logger.log_info(this.getClass().getSimpleName(), "Joining system...");
 
+        udpMulticastServer = new UDPMulticastServer(interfaceName, multicastAddress, multicastPort);
+        udpMulticastClient = new UDPMulticastClient(interfaceName, multicastAddress, multicastPort);
+        healthcheckDaemon = new HealthcheckDaemon(healthcheckPeriod);
+
         performDiscover();
 
         if (nodes.isEmpty()) {
@@ -168,6 +173,7 @@ public class RaSystem {
 
         localNode.setState(NodeState.IDLE);
         StatusPanelController.getInstance().setState(localNode.getState());
+        StatusPanelController.getInstance().setNodeId(localNode.getId());
 
         performListing();
 
@@ -213,6 +219,7 @@ public class RaSystem {
         // Local node reset
         localNode = new Node(0, NodeState.READY);
         StatusPanelController.getInstance().setState(localNode.getState());
+        StatusPanelController.getInstance().setNodeId(localNode.getId());
 
         Logger.log_info(this.getClass().getSimpleName(), "System left.");
     }
@@ -477,5 +484,9 @@ public class RaSystem {
             // Interrupt background task
             healthcheckDaemon.stop();
         }
+    }
+
+    public UDPMulticastServer getUdpMulticastServer() {
+        return udpMulticastServer;
     }
 }

@@ -34,7 +34,7 @@ public class App extends Application {
 
     @Override
     public void stop() {
-        RaSystem.getInstance().leaveSystem();
+        RaSystem.getInstance().getUdpMulticastServer().stop();
         Platform.exit();
     }
 

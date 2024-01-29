@@ -32,6 +32,12 @@ public class UDPMulticastServer extends Task<Void> {
         port = -1;
     }
 
+    public UDPMulticastServer(String interfaceName, String address, int port) {
+        this.interfaceName = interfaceName;
+        this.address = address;
+        this.port = port;
+    }
+
     @Override
     protected Void call() throws Exception {
         InetAddress group = null;
@@ -122,8 +128,6 @@ public class UDPMulticastServer extends Task<Void> {
                             // Build standard response message
                             responseData = new Message(responseType, RaSystem.getInstance().getLocalNode().getId()).toString();
                         }
-
-                        System.err.println(" [*] UDP Server : Response data : " + responseData);
                         
                         byte[] responseBuffer = responseData.getBytes();
 
@@ -158,7 +162,7 @@ public class UDPMulticastServer extends Task<Void> {
         if (thread == null) {
             thread = new Thread(this);
             thread.start();
-            Logger.log_info(this.getClass().getSimpleName(), String.format("Listening at [%s] %s:%d ...", interfaceName, address, port));
+            Logger.log_info(this.getClass().getSimpleName(), String.format("Listening in group at [%s] %s:%d ...", interfaceName, address, port));
         }
     }
 

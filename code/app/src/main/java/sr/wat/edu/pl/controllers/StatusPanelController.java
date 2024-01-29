@@ -23,6 +23,8 @@ public class StatusPanelController {
     private Label netInterfaceInfoLabel;
     @FXML
     private Label multicastGroupInfoLabel;
+    @FXML
+    private Label nodeIdLabel;
 
     // Node status
     @FXML
@@ -98,6 +100,12 @@ public class StatusPanelController {
                 default:
                     break;
             }
+        }
+    }
+    
+    public void setNodeId(int id) {
+        if (nodeIdLabel != null) {
+            nodeIdLabel.setText(String.valueOf(id));
         }
     }
 }
