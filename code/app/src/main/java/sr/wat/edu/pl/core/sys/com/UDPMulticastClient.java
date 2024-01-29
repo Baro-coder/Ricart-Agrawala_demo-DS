@@ -74,7 +74,7 @@ public class UDPMulticastClient {
 
         Logger.log_debug(this.getClass().getSimpleName(), "Datagram send: " + message);
 
-        ArrayList<Integer> nodesIds = receiveUDPResponse(socket, 5000, expectedResponseType);
+        ArrayList<Integer> nodesIds = receiveUDPResponse(socket, 3000, expectedResponseType);
 
         socket.close();
 

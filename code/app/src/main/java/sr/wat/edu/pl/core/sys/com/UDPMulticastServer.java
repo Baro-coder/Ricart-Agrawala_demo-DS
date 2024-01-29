@@ -70,7 +70,6 @@ public class UDPMulticastServer implements Runnable {
 
                 // Gather datagram
                 String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
-                System.err.println(" [!!!] UDP Server recv msg: " + receivedMessage);
 
                 // Decode message
                 Message raMsg = Message.decodeDatagramMessage(receivedMessage);
@@ -88,7 +87,7 @@ public class UDPMulticastServer implements Runnable {
                                 responseType = MessageType.HELLO;
                             break;
                         case BYE:
-                                // ignore;
+                                RaSystem.getInstance().removeNodeById(raMsg.getNodeId());
                             break;
                         case HELLO:
                                 // ignore;
@@ -103,6 +102,9 @@ public class UDPMulticastServer implements Runnable {
                         case REQUEST:
                                 // TODO: Check the list
                                 // -- send RESPONSE or ignore;
+                                if (RaSystem.getInstance().handleRequest(raMsg) == 0) {
+                                    responseType = MessageType.RESPONSE;
+                                }
                             break;
                         case RESPONSE:
                                 // TODO: Check the list

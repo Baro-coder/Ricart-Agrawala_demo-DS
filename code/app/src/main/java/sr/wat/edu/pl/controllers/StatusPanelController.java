@@ -2,7 +2,9 @@ package sr.wat.edu.pl.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import sr.wat.edu.pl.core.sys.Node.NodeState;
 
 public class StatusPanelController {
     private static StatusPanelController instance;
@@ -37,9 +39,7 @@ public class StatusPanelController {
     private void initialize() {
         instance = this;
 
-        // Node status
-        statusLabel.setText("Init...");
-        stateLabel.setText("Init");
+        setState(NodeState.NOT_READY);
     }
 
 
@@ -62,9 +62,30 @@ public class StatusPanelController {
         }
     }
 
-    public void setState(String text) {
+    public void setState(NodeState state) {
         if (stateLabel != null) {
-            stateLabel.setText(text);
+            stateLabel.setText(state.name());
+            
+            switch (state) {
+                case NOT_READY:
+                    stateDiode.setFill(Color.GRAY);
+                    break;
+                case READY:
+                    stateDiode.setFill(Color.RED);
+                    break;
+                case IDLE:
+                    stateDiode.setFill(Color.BLUE);
+                    break;
+                case WAITING:
+                    stateDiode.setFill(Color.YELLOW);
+                    break;
+                case WORKING:
+                    stateDiode.setFill(Color.GREEN);
+                    break;
+            
+                default:
+                    break;
+            }
         }
     }
 }

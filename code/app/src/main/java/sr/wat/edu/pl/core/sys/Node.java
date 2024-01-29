@@ -18,6 +18,11 @@ public class Node {
         state = NodeState.NOT_READY;
     }
 
+    public Node(int id, NodeState state) {
+        this.id = id;
+        this.state = state;
+    }
+
 
     public int getId() {
         return id;

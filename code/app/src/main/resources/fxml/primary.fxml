@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -51,15 +52,6 @@
                               </AnchorPane>
                            </content>
                         </Tab>
-                        <Tab text="System">
-                           <content>
-                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                 <children>
-                                    <StackPane prefHeight="581.0" prefWidth="250.0" />
-                                    <fx:include fx:id="sysSettings" source="include/sysSettings.fxml" />
-                                 </children></AnchorPane>
-                           </content>
-                        </Tab>
                      </tabs>
                   </TabPane>
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
@@ -93,6 +85,23 @@
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
+                              </AnchorPane>
+                           </content>
+                        </Tab>
+                        <Tab text="Requests">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <StackPane prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                       <children>
+                                          <ListView fx:id="requestsListView" prefHeight="200.0" prefWidth="200.0">
+                                             <StackPane.margin>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </StackPane.margin>
+                                          </ListView>
+                                       </children>
+                                    </StackPane>
+                                 </children>
                               </AnchorPane>
                            </content>
                         </Tab>

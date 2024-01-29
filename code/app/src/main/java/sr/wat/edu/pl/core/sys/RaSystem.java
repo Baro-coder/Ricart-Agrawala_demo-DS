@@ -1,9 +1,12 @@
 package sr.wat.edu.pl.core.sys;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import sr.wat.edu.pl.controllers.PrimaryController;
 import sr.wat.edu.pl.controllers.StatusPanelController;
 import sr.wat.edu.pl.core.Logger;
+import sr.wat.edu.pl.core.sys.Node.NodeState;
 import sr.wat.edu.pl.core.sys.com.Message;
 import sr.wat.edu.pl.core.sys.com.UDPMulticastClient;
 import sr.wat.edu.pl.core.sys.com.UDPMulticastServer;
@@ -32,11 +35,12 @@ public class RaSystem {
     private UDPMulticastServer udpMulticastServer;
     private UDPMulticastClient udpMulticastClient;
 
+    private List<Message> requests;
 
     public RaSystem() {
         nodes = new ArrayList<>();
         localNode = new Node(-1);
-        StatusPanelController.getInstance().setState(localNode.getState().name());
+        StatusPanelController.getInstance().setState(localNode.getState());
 
         interfaceName = null;
         multicastAddress = null;
@@ -97,6 +101,8 @@ public class RaSystem {
             }
             localNode = new Node(maxId + 1);
         }
+        localNode.setState(NodeState.IDLE);
+        StatusPanelController.getInstance().setState(localNode.getState());
 
         udpMulticastServer.start();
 
@@ -119,8 +125,8 @@ public class RaSystem {
         nodes.clear();
 
         // Local node reset
-        localNode = new Node(0);
-        StatusPanelController.getInstance().setState(localNode.getState().name());
+        localNode = new Node(0, NodeState.READY);
+        StatusPanelController.getInstance().setState(localNode.getState());
 
         udpMulticastServer.stop();
 
@@ -129,16 +135,64 @@ public class RaSystem {
 
     public void sendRequest() {
         sendMessage(MessageType.REQUEST);
+        localNode.setState(NodeState.WAITING);
+        StatusPanelController.getInstance().setState(localNode.getState());
     }
 
     public void sendResponse() {
         sendMessage(MessageType.RESPONSE);
+        localNode.setState(NodeState.IDLE);
+        StatusPanelController.getInstance().setState(localNode.getState());
     }
 
     public void sendHealthcheck() {
         sendMessage(MessageType.HEALTHCHECK_REQUEST);
     }
 
+    private String showRequests() {
+        StringBuilder builder = new StringBuilder();
+        for(Message request : requests) {
+            builder.append(String.format("(%d :: %d) ", request.getTimestamp(), request.getNodeId()));
+        }
+        return builder.toString();
+    }
+
+    private boolean isLocalNodeInQueue() {
+        for(Message request : requests) {
+            if (request.getNodeId() == localNode.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int handleRequest(Message request) {
+        boolean inserted = false;
+
+        if (requests.isEmpty()) {
+            requests.add(request);
+            inserted = true;
+        } else {
+            for (Message req : requests) {
+                if (req.getTimestamp() > request.getTimestamp()) {
+                    requests.add(requests.indexOf(req), request);
+                    inserted = true;
+                }
+            }
+        }
+        if (!inserted) {
+            requests.add(requests.size(), request);
+        }
+
+        PrimaryController.getInstance().addRequestsToList(requests.indexOf(request), String.format("T%d :: Node[%d]", request.getTimestamp(), request.getNodeId()));
+
+        Logger.log_debug(this.getClass().getSimpleName(), "Requests: " + showRequests());
+
+        if (isLocalNodeInQueue()) {
+            return 1;
+        }
+        return 0;
+    }
     /*
      * 
      * Getters and Setters
@@ -150,8 +204,17 @@ public class RaSystem {
 
     public void addNode(Node node) {
         if (!nodes.contains(node)) {
-            Logger.log_info(this.getClass().getSimpleName(), "Added node : " + node.getId());
             nodes.add(node);
+            Logger.log_info(this.getClass().getSimpleName(), "Added node : " + node);
+        }
+    }
+
+    public void removeNodeById(int nodeId) {
+        for (Node node : nodes) {
+            if (node.getId() == nodeId) {
+                nodes.remove(node);
+                Logger.log_info(this.getClass().getSimpleName(), "Removed node : " + node);
+            }
         }
     }
 

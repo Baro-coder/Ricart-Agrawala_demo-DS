@@ -3,6 +3,7 @@ package sr.wat.edu.pl.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import sr.wat.edu.pl.core.sys.RaSystem;
+import sr.wat.edu.pl.core.sys.Node.NodeState;
 
 public class CtlPanelController {
 
@@ -45,10 +46,14 @@ public class CtlPanelController {
     public void enableToJoin() {
         setButtonsDisable(true);
         joinSystemButton.setDisable(false);
+        RaSystem.getInstance().getLocalNode().setState(NodeState.READY);
+        StatusPanelController.getInstance().setState(NodeState.READY);
     }
 
     public void disableToJoin() {
         setButtonsDisable(true);
+        RaSystem.getInstance().getLocalNode().setState(NodeState.NOT_READY);
+        StatusPanelController.getInstance().setState(NodeState.NOT_READY);
     }
 
     private void setButtonsDisable(boolean value) {
