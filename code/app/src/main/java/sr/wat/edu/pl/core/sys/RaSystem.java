@@ -7,6 +7,7 @@ import sr.wat.edu.pl.controllers.PrimaryController;
 import sr.wat.edu.pl.controllers.StatusPanelController;
 import sr.wat.edu.pl.core.Logger;
 import sr.wat.edu.pl.core.sys.Node.NodeState;
+import sr.wat.edu.pl.core.sys.com.HealthcheckDaemon;
 import sr.wat.edu.pl.core.sys.com.Message;
 import sr.wat.edu.pl.core.sys.com.UDPMulticastClient;
 import sr.wat.edu.pl.core.sys.com.UDPMulticastServer;
@@ -119,7 +120,18 @@ public class RaSystem {
         Message msg = new Message(MessageType.HEALTHCHECK_REQUEST, localNode.getId());
 
         try {
-            nodeIds = udpMulticastClient.sendUDPMessageAndReceiveNodeIds(msg.toString(), MessageType.HEALTHCHECK_REPLY);
+            for(int i = 0; i < 4; i++) {
+                ArrayList<Integer> tmpNodeIds = new ArrayList<>();
+            
+                tmpNodeIds = udpMulticastClient.sendUDPMessageAndReceiveNodeIds(msg.toString(), MessageType.HEALTHCHECK_REPLY);
+            
+                if (nodeIds == null || tmpNodeIds.size() > nodeIds.size()) {
+                    nodeIds = tmpNodeIds;
+                    tmpNodeIds = null;
+                }
+
+                Thread.sleep(100);
+            }
         } catch (Exception e) {
             Logger.log_error(this.getClass().getSimpleName(), e.getMessage());
             e.printStackTrace();
@@ -169,6 +181,10 @@ public class RaSystem {
     }
 
     public void leaveSystem() {
+        if (localNode.getState() == NodeState.READY || localNode.getState() == NodeState.NOT_READY) {
+            return;
+        }
+
         Logger.log_info(this.getClass().getSimpleName(), "Leaving system...");
 
         // Stop Multicast server

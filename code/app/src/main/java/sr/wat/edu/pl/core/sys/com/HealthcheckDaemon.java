@@ -1,7 +1,8 @@
-package sr.wat.edu.pl.core.sys;
+package sr.wat.edu.pl.core.sys.com;
 
 import javafx.concurrent.Task;
 import sr.wat.edu.pl.core.Logger;
+import sr.wat.edu.pl.core.sys.RaSystem;
 
 public class HealthcheckDaemon extends Task<Void> {
     private Thread thread;

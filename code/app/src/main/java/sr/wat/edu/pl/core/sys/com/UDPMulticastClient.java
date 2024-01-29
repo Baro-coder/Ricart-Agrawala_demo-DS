@@ -74,7 +74,7 @@ public class UDPMulticastClient {
 
         Logger.log_debug(this.getClass().getSimpleName(), "Datagram send: " + message);
 
-        ArrayList<Integer> nodesIds = receiveHelloUDPResponse(socket, 1000, expectedResponseType);
+        ArrayList<Integer> nodesIds = receiveHelloUDPResponse(socket, 2500, expectedResponseType);
 
         socket.close();
 
@@ -123,7 +123,7 @@ public class UDPMulticastClient {
 
         Logger.log_debug(this.getClass().getSimpleName(), "Datagram send: " + message);
 
-        ArrayList<Message> requests = receiveListUDPResponse(socket, 1000, expectedResponseType);
+        ArrayList<Message> requests = receiveListUDPResponse(socket, 2500, expectedResponseType);
 
         socket.close();
 

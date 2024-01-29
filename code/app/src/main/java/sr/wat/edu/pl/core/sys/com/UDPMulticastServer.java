@@ -155,15 +155,19 @@ public class UDPMulticastServer extends Task<Void> {
     }
 
     public void start() {
-        thread = new Thread(this);
-        thread.start();
-
-        Logger.log_info(this.getClass().getSimpleName(), String.format("Listening at [%s] %s:%d ...", interfaceName, address, port));
+        if (thread == null) {
+            thread = new Thread(this);
+            thread.start();
+            Logger.log_info(this.getClass().getSimpleName(), String.format("Listening at [%s] %s:%d ...", interfaceName, address, port));
+        }
     }
 
     public void stop() {
-        thread.interrupt();
-        Logger.log_info(this.getClass().getSimpleName(), "Listening stoped.");
+        if (thread != null) {
+            thread.interrupt();
+            Logger.log_info(this.getClass().getSimpleName(), "Listening stoped.");
+            thread = null;
+        }
     }
 
     public void setInterfaceName(String name) {
