@@ -8,7 +8,6 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="80.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sr.wat.edu.pl.controllers.StatusPanelController">
    <children>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
@@ -44,7 +43,7 @@
                <children>
                   <Label fx:id="statusLabel" text="Node status ...">
                      <font>
-                        <Font size="15.0" />
+                        <Font name="Liberation Mono" size="18.0" />
                      </font>
                   </Label>
                </children>

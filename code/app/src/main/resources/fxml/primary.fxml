@@ -57,11 +57,18 @@
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
                   <TabPane prefHeight="200.0" prefWidth="500.0" tabClosingPolicy="UNAVAILABLE">
                      <tabs>
-                        <Tab text="Topology">
+                        <Tab text="Nodes">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <StackPane prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+                                    <StackPane prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                       <children>
+                                          <ListView fx:id="nodesListView" prefHeight="200.0" prefWidth="200.0">
+                                             <StackPane.margin>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </StackPane.margin>
+                                          </ListView>
+                                       </children></StackPane>
                                  </children>
                               </AnchorPane>
                            </content>

@@ -68,18 +68,23 @@ public class StatusPanelController {
             
             switch (state) {
                 case NOT_READY:
+                    setStatus("Node has to be configured.");
                     stateDiode.setFill(Color.GRAY);
                     break;
                 case READY:
+                    setStatus("Ready to join the system.");
                     stateDiode.setFill(Color.RED);
                     break;
                 case IDLE:
+                    setStatus("No requested tasks.");
                     stateDiode.setFill(Color.BLUE);
                     break;
                 case WAITING:
+                    // setStatus("Waiting for access.");
                     stateDiode.setFill(Color.YELLOW);
                     break;
                 case WORKING:
+                    setStatus("Access Granted! Working...");
                     stateDiode.setFill(Color.GREEN);
                     break;
             

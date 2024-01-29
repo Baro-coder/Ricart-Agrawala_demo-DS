@@ -4,15 +4,13 @@ import java.time.Instant;
 
 import javafx.application.Platform;
 import sr.wat.edu.pl.controllers.PrimaryController;
-import sr.wat.edu.pl.core.sys.com.Message;
+
 
 public class Logger {
     /*
      * Interface for runtime info logging
      * 
      */
-
-
     public static enum LogLevel {
         /*
          *  Log level enumeration

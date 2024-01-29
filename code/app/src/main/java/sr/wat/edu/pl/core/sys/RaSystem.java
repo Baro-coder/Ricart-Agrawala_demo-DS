@@ -37,6 +37,7 @@ public class RaSystem {
 
     private ArrayList<Message> requests;
 
+
     public RaSystem() {
         nodes = new ArrayList<>();
         localNode = new Node(-1);
@@ -115,8 +116,6 @@ public class RaSystem {
 
         performDiscover();
 
-        performListing();
-
         if (nodes.isEmpty()) {
             localNode = new Node(1);
         } else {
@@ -128,8 +127,12 @@ public class RaSystem {
             }
             localNode = new Node(maxId + 1);
         }
+        addNode(localNode);
+
         localNode.setState(NodeState.IDLE);
         StatusPanelController.getInstance().setState(localNode.getState());
+
+        performListing();
 
         udpMulticastServer.start();
 
@@ -138,6 +141,9 @@ public class RaSystem {
 
     public void leaveSystem() {
         Logger.log_info(this.getClass().getSimpleName(), "Leaving system...");
+
+        // Stop Multicast server
+        udpMulticastServer.stop();
 
         // BYE send
         Message msg = new Message(MessageType.BYE, localNode.getId());
@@ -150,12 +156,15 @@ public class RaSystem {
 
         // Node list clear
         nodes.clear();
+        PrimaryController.getInstance().clearNodes();
+
+        // Requests clear
+        requests.clear();
+        PrimaryController.getInstance().clearRequestsList();
 
         // Local node reset
         localNode = new Node(0, NodeState.READY);
         StatusPanelController.getInstance().setState(localNode.getState());
-
-        udpMulticastServer.stop();
 
         Logger.log_info(this.getClass().getSimpleName(), "System left.");
     }
@@ -197,6 +206,42 @@ public class RaSystem {
         return false;
     }
 
+    private void removeNode(Node node) {
+        Platform.runLater(() -> {
+            PrimaryController ctl = PrimaryController.getInstance();
+            ctl.removeNode(node);
+        });
+        nodes.remove(node);
+    }
+
+    private void removeNodeRequests(Node node) {
+        ArrayList<Message> newRequests = new ArrayList<>();
+        
+        for (Message req : requests) {
+            if (req.getNodeId() != node.getId()) {
+                newRequests.add(req);
+            }
+        }
+
+        ArrayList<String> records = new ArrayList<>();
+
+        requests.clear();
+        requests = newRequests;
+
+        for (Message req : requests) {
+            records.add(String.format("T%d :: Node[%d]", req.getTimestamp(), req.getNodeId()));
+        }
+
+        Platform.runLater(() -> {
+            PrimaryController.getInstance().clearRequestsList();
+
+            PrimaryController.getInstance().addAllRequests(records);
+        });
+
+        
+    }
+
+
     public void handleRequest(Message request) {
         Platform.runLater(() -> {
             boolean inserted = false;
@@ -219,21 +264,23 @@ public class RaSystem {
             PrimaryController.getInstance().addRequestToList(requests.indexOf(request), String.format("T%d :: Node[%d]", request.getTimestamp(), request.getNodeId()));
 
             Logger.log_debug(this.getClass().getSimpleName(), "Requests: " + showRequests());
+
+            if (!isLocalNodeInQueue()) {
+                sendResponse();
+            }
         });
     }
 
 
-    /*
-     * 
-     * Getters and Setters
-     * 
-     */
     public ArrayList<Node> getNodes() {
         return nodes;
     }
 
     public void addNode(Node node) {
         if (!nodes.contains(node)) {
+            Platform.runLater(() -> {
+                PrimaryController.getInstance().addNodeToList(node);
+            });
             nodes.add(node);
             Logger.log_info(this.getClass().getSimpleName(), "Added node : " + node);
         }
@@ -242,8 +289,13 @@ public class RaSystem {
     public void removeNodeById(int nodeId) {
         for (Node node : nodes) {
             if (node.getId() == nodeId) {
-                nodes.remove(node);
+
+                removeNodeRequests(node);
+                
+                removeNode(node);
+
                 Logger.log_info(this.getClass().getSimpleName(), "Removed node : " + node);
+                break;
             }
         }
     }

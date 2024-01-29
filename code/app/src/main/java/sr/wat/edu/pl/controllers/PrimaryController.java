@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import sr.wat.edu.pl.core.sys.Node;
 
 
 public class PrimaryController {
@@ -21,6 +22,8 @@ public class PrimaryController {
     private TextArea logTextArea;
     @FXML
     private ListView<String> requestsListView;
+    @FXML
+    private ListView<Node> nodesListView;
 
 
     public PrimaryController() {
@@ -51,5 +54,21 @@ public class PrimaryController {
         if (requestsListView.getItems().size() > index) {
             requestsListView.getItems().remove(index);
         }
+    }
+
+    public void clearRequestsList() {
+        requestsListView.getItems().clear();
+    }
+
+    public void addNodeToList(Node node) {
+        nodesListView.getItems().add(node);
+    }
+
+    public void removeNode(Node node) {
+        nodesListView.getItems().remove(node);
+    }
+
+    public void clearNodes() {
+        nodesListView.getItems().clear();
     }
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import javafx.concurrent.Task;
 import sr.wat.edu.pl.core.Logger;
+import sr.wat.edu.pl.core.sys.Node;
 import sr.wat.edu.pl.core.sys.RaSystem;
 import sr.wat.edu.pl.core.sys.com.Message.MessageType;
 
@@ -92,6 +93,7 @@ public class UDPMulticastServer extends Task<Void> {
                                 RaSystem.getInstance().removeNodeById(raMsg.getNodeId());
                             break;
                         case LIST_REQUEST:
+                                RaSystem.getInstance().addNode(new Node(raMsg.getNodeId()));
                                 responseType = MessageType.LIST_REPLY;
                             break;
                         case HEALTHCHECK_REQUEST:
