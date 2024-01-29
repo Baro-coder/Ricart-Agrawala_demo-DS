@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import sr.wat.edu.pl.core.net.NetInterface;
+import sr.wat.edu.pl.core.net.NetManager;
 import sr.wat.edu.pl.core.sys.Node.NodeState;
 
 public class StatusPanelController {
@@ -40,6 +42,11 @@ public class StatusPanelController {
         instance = this;
 
         setState(NodeState.NOT_READY);
+
+        NetInterface activeInterface = NetManager.getInstance().getActiveInterface();
+        if (activeInterface != null) {
+            setInterfaceInfo(activeInterface.getName(), activeInterface.getAddress(), activeInterface.getMaskLength());
+        }   
     }
 
 

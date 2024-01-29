@@ -64,7 +64,9 @@ public class NetManager {
 
     public void updateInterfacesList() {
         Logger.log_info(this.getClass().getSimpleName(), "Updating interface list...");
-        interfaces.clear();
+        if (!interfaces.isEmpty()) {
+            interfaces.clear();
+        }
 
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -74,7 +76,7 @@ public class NetManager {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
                 
                 String name = networkInterface.getDisplayName();
-                if (name != null && networkInterface.supportsMulticast()) {
+                if (name != null && networkInterface.isUp() && networkInterface.supportsMulticast()) {
 
                     List<InterfaceAddress> intfAddresses = networkInterface.getInterfaceAddresses();
                     InterfaceAddress intf = intfAddresses.get(intfAddresses.size() - 1);
@@ -175,6 +177,7 @@ public class NetManager {
     public void setHealthcheckPeriod(int period) {
         if (healthcheckPeriod != period) {
             healthcheckPeriod = period;
+            raSystem.setHealthcheckPeriod(period);
             Logger.log_info(this.getClass().getSimpleName(), "Healthcheck period ->  " + healthcheckPeriod);
         }
     }
@@ -182,6 +185,7 @@ public class NetManager {
     public void setAutoHealthcheck(boolean state) {
         if (autoHealthcheck != state) {
             autoHealthcheck = state;
+            raSystem.setAutoHealthcheck(state);
             Logger.log_info(this.getClass().getSimpleName(), "Auto Healthcheck ->  " + state);
         }
     }

@@ -34,6 +34,7 @@ public class RaSystem {
 
     private UDPMulticastServer udpMulticastServer;
     private UDPMulticastClient udpMulticastClient;
+    private HealthcheckDaemon healthcheckDaemon;
 
     private ArrayList<Message> requests;
 
@@ -52,6 +53,7 @@ public class RaSystem {
 
         udpMulticastServer = new UDPMulticastServer();
         udpMulticastClient = new UDPMulticastClient();
+        healthcheckDaemon = new HealthcheckDaemon(healthcheckPeriod);
 
         requests = new ArrayList<Message>() {};
     }
@@ -436,9 +438,18 @@ public class RaSystem {
 
     public void setHealthcheckPeriod(int value) {
         healthcheckPeriod = value;
+        healthcheckDaemon.setPeriod(value);
     }
 
     public void setAutoHealthcheck(boolean value) {
         autoHealthcheck = value;
+        
+        if (value == true) {
+            // Run background task
+            healthcheckDaemon.start();
+        } else {
+            // Interrupt background task
+            healthcheckDaemon.stop();
+        }
     }
 }

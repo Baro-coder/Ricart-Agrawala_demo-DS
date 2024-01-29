@@ -95,6 +95,10 @@ public class NetSettingsController {
         });
         if (interfaceComboBox.getItems().isEmpty()) {
             interfaceErrorLabel.setText("No available interface!");
+        } else {
+            String selected = interfaceComboBox.getItems().get(0);
+            interfaceComboBox.setValue(selected);
+            handleInterfaceComboBoxChange(selected);
         }
         
 
