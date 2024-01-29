@@ -1,10 +1,12 @@
 package sr.wat.edu.pl;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import sr.wat.edu.pl.core.sys.RaSystem;
 
 import java.io.IOException;
 
@@ -28,6 +30,12 @@ public class App extends Application {
 
         stage.setScene(scene);
         stage.show();
+    }
+
+    @Override
+    public void stop() {
+        RaSystem.getInstance().leaveSystem();
+        Platform.exit();
     }
 
     public static void main(String[] args) {
