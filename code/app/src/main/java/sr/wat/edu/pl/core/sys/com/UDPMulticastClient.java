@@ -7,8 +7,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import sr.wat.edu.pl.core.Logger;
 
 import sr.wat.edu.pl.core.sys.com.Message.MessageType;
@@ -76,39 +74,11 @@ public class UDPMulticastClient {
 
         Logger.log_debug(this.getClass().getSimpleName(), "Datagram send: " + message);
 
-        CompletableFuture<ArrayList<Integer>> future = new CompletableFuture<>();
-
-        Thread receiveThread = new Thread(() -> {
-            try {
-                ArrayList<Integer> receivedNodeIds = receiveUDPResponse(socket, 5, expectedResponseType);
-                future.complete(receivedNodeIds);
-            } catch (IOException e) {
-                future.completeExceptionally(e);
-            }
-        });
-        receiveThread.start();
-
-        try {
-            CompletableFuture.runAsync(() -> {
-                try {
-                    receiveThread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        ArrayList<Integer> nodesIds = receiveUDPResponse(socket, 5000, expectedResponseType);
 
         socket.close();
 
-        try {
-            return future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        return new ArrayList<>();
+        return nodesIds;
     }
 
     private static ArrayList<Integer> receiveUDPResponse(DatagramSocket socket, int timeout, MessageType expectedResponseType) throws IOException {

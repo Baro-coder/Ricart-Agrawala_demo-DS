@@ -1,8 +1,13 @@
 package sr.wat.edu.pl.core.sys.com;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import sr.wat.edu.pl.core.Logger;
 import sr.wat.edu.pl.core.sys.RaSystem;
@@ -28,12 +33,32 @@ public class UDPMulticastServer implements Runnable {
     @Override
     public void run() {
         isRunning = true;
-        DatagramSocket socket = null;
+
+        InetAddress group = null;
+        try {
+            group = InetAddress.getByName(address);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        InetSocketAddress sockaddr = new InetSocketAddress(group, port);
+
+        MulticastSocket socket = null;
+        
+        NetworkInterface networkInterface = null;
+        try {
+            networkInterface = NetworkInterface.getByName(interfaceName);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
 
         try {
             // Create socket
-            InetAddress serverAddress = InetAddress.getByName(address);
-            socket = new DatagramSocket(port, serverAddress);
+            
+            socket = new MulticastSocket(port);
+            socket.joinGroup(sockaddr, networkInterface);
+            
+            Logger.log_debug(this.getClass().getSimpleName(), String.format("Socket [%s:%d] opened.", address, port));
 
             while (isRunning) {
                 // Prepare packet to being received
@@ -45,6 +70,7 @@ public class UDPMulticastServer implements Runnable {
 
                 // Gather datagram
                 String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
+                System.err.println(" [!!!] UDP Server recv msg: " + receivedMessage);
 
                 // Decode message
                 Message raMsg = Message.decodeDatagramMessage(receivedMessage);
@@ -103,8 +129,16 @@ public class UDPMulticastServer implements Runnable {
             e.printStackTrace();
         } finally {
             if (socket != null && !socket.isClosed()) {
+                try {
+                    // Opuść grupę multicastową przed zamknięciem socketu
+                    socket.leaveGroup(sockaddr, networkInterface);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        
                 socket.close();
             }
+            Logger.log_info(this.getClass().getSimpleName(), String.format("Socket [%s:%d] closed.", address, port));
         }
     }
 

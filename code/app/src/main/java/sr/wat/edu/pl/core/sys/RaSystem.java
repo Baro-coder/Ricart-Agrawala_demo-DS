@@ -98,6 +98,8 @@ public class RaSystem {
             localNode = new Node(maxId + 1);
         }
 
+        udpMulticastServer.start();
+
         Logger.log_info(this.getClass().getSimpleName(), "Joined.");
     }
 
@@ -119,6 +121,8 @@ public class RaSystem {
         // Local node reset
         localNode = new Node(0);
         StatusPanelController.getInstance().setState(localNode.getState().name());
+
+        udpMulticastServer.stop();
 
         Logger.log_info(this.getClass().getSimpleName(), "System left.");
     }

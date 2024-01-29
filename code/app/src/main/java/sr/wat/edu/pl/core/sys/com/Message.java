@@ -41,11 +41,17 @@ public class Message {
             int _endIndex = datagramMsg.lastIndexOf('[') - 2;
             
             String datagramMsgType = datagramMsg.substring(0, _endIndex);
-            String datagramMsgNodeId = datagramMsg.substring(_endIndex + 5, datagramMsg.length() - 5);
+            String datagramMsgNodeId = datagramMsg.substring(_endIndex + 8, datagramMsg.length() - 5);
 
             Logger.log_debug(Message.class.getSimpleName(), " Received Datagram : " + message);
             Logger.log_debug(Message.class.getSimpleName(), "    - Type : " + datagramMsgType);
             Logger.log_debug(Message.class.getSimpleName(), "    - Node : " + datagramMsgNodeId);
+
+            try {
+                MessageType msgType = MessageType.valueOf(datagramMsgType);
+                int nodeId = Integer.parseInt(datagramMsgNodeId);
+                return new Message(msgType, nodeId);
+            } catch (Exception ignored) {}
         }
         return null;
     }
