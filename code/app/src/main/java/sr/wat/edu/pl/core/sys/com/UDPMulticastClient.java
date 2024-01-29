@@ -55,7 +55,7 @@ public class UDPMulticastClient {
         socket.close();
     }
 
-    public ArrayList<Integer> sendUDPMessageAndReceiveResponsedNodeIds(String message, MessageType expectedResponseType) throws NullPointerException, IOException {
+    public ArrayList<Integer> sendUDPMessageAndReceiveHelloResponsedNodeIds(String message, MessageType expectedResponseType) throws NullPointerException, IOException {
         if (interfaceName == null) {
             throw new NullPointerException("netInterface is unset!");
         }
@@ -74,14 +74,14 @@ public class UDPMulticastClient {
 
         Logger.log_debug(this.getClass().getSimpleName(), "Datagram send: " + message);
 
-        ArrayList<Integer> nodesIds = receiveUDPResponse(socket, 3000, expectedResponseType);
+        ArrayList<Integer> nodesIds = receiveHelloUDPResponse(socket, 1000, expectedResponseType);
 
         socket.close();
 
         return nodesIds;
     }
 
-    private static ArrayList<Integer> receiveUDPResponse(DatagramSocket socket, int timeout, MessageType expectedResponseType) throws IOException {
+    private static ArrayList<Integer> receiveHelloUDPResponse(DatagramSocket socket, int timeout, MessageType expectedResponseType) throws IOException {
         ArrayList<Integer> nodeIds = new ArrayList<Integer>();
         byte[] buffer = new byte[1024];
         
@@ -96,13 +96,62 @@ public class UDPMulticastClient {
                 
                 Message raMsg = Message.decodeDatagramMessage(responseMsg);
                 if (raMsg != null && raMsg.getType() == expectedResponseType) {
-                    Logger.log_debug(UDPMulticastClient.class.getSimpleName(), "Response received: " + raMsg);
                     nodeIds.add(raMsg.getNodeId());
                 }
             }
         } catch (java.net.SocketTimeoutException ignored) {} 
 
         return nodeIds;
+    }
+
+    public ArrayList<Message> sendUDPMessageAndReceiveListResponsedNodeIds(String message, MessageType expectedResponseType) throws NullPointerException, IOException {
+        if (interfaceName == null) {
+            throw new NullPointerException("netInterface is unset!");
+        }
+        NetworkInterface networkInterface = NetworkInterface.getByName(interfaceName);
+        InetAddress interfaceAddress = getInetAddressForNetworkInterface(networkInterface);
+
+        if (groupAddress == null || port == -1) {
+            throw new NullPointerException("groupAddress or port is unset!");
+        }
+        DatagramSocket socket = new DatagramSocket(new java.net.InetSocketAddress(interfaceAddress, 0));
+        InetAddress group = InetAddress.getByName(groupAddress);
+        byte[] msg = message.getBytes();
+
+        DatagramPacket packet = new DatagramPacket(msg, msg.length, group, port);
+        socket.send(packet);
+
+        Logger.log_debug(this.getClass().getSimpleName(), "Datagram send: " + message);
+
+        ArrayList<Message> requests = receiveListUDPResponse(socket, 1000, expectedResponseType);
+
+        socket.close();
+
+        return requests;
+    }
+
+    private static ArrayList<Message> receiveListUDPResponse(DatagramSocket socket, int timeout, MessageType expectedResponseType) throws IOException {
+        ArrayList<Message> requests = new ArrayList<Message>();
+        byte[] buffer = new byte[1024];
+        
+        DatagramPacket responsePacket = new DatagramPacket(buffer, buffer.length);
+
+        socket.setSoTimeout(timeout);
+
+        try {
+            while (true) {
+                socket.receive(responsePacket);
+                String responseMsg = new String(responsePacket.getData(), responsePacket.getOffset(), responsePacket.getLength());
+                
+                ListMessage raMsg = ListMessage.decodeDatagramListMessage(responseMsg);
+                if (raMsg != null && raMsg.getType() == expectedResponseType) {
+                    requests = raMsg.getRequests();
+                    break;
+                }
+            }
+        } catch (java.net.SocketTimeoutException ignored) {} 
+
+        return requests;
     }
     
     public void setInterfaceName(String interfaceName) {

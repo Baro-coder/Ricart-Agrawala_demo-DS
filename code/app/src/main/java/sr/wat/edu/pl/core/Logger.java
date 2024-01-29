@@ -1,6 +1,10 @@
 package sr.wat.edu.pl.core;
 
+import java.time.Instant;
+
+import javafx.application.Platform;
 import sr.wat.edu.pl.controllers.PrimaryController;
+import sr.wat.edu.pl.core.sys.com.Message;
 
 public class Logger {
     /*
@@ -20,12 +24,16 @@ public class Logger {
         CRITICAL
     }
 
-    private static String FORMAT_STRING = "[%s]\t: [ %-15s] : %s";
+    private static String FORMAT_STRING = "[%s]\t[%s]\t: [ %-15s] : %s";
 
     private static void log(LogLevel level, String subject, String msg) {
-        String text = String.format(FORMAT_STRING, level.toString(), subject, msg);
+        Instant instant = Instant.now();
+        String timestamp = instant.toString();
+        String text = String.format(FORMAT_STRING, timestamp, level.toString(), subject, msg);
         System.err.println(text);
-        PrimaryController.getInstance().appendLog(text);
+        Platform.runLater(() -> {
+            PrimaryController.getInstance().appendLog(text);
+        });
     }
 
     // Print log DEBUG

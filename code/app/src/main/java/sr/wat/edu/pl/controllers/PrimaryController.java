@@ -1,5 +1,7 @@
 package sr.wat.edu.pl.controllers;
 
+import java.util.ArrayList;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -18,7 +20,7 @@ public class PrimaryController {
     @FXML
     private TextArea logTextArea;
     @FXML
-    private ListView requestsListView;
+    private ListView<String> requestsListView;
 
 
     public PrimaryController() {
@@ -37,8 +39,12 @@ public class PrimaryController {
         }
     }
 
-    public void addRequestsToList(int index, String record) {
+    public void addRequestToList(int index, String record) {
         requestsListView.getItems().add(index, record);
+    }
+
+    public void addAllRequests(ArrayList<String> records) {
+        requestsListView.getItems().addAll(records);
     }
 
     public void removeRequestByIndex(int index) {

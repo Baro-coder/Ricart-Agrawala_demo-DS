@@ -1,8 +1,8 @@
 package sr.wat.edu.pl.core.sys;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import javafx.application.Platform;
 import sr.wat.edu.pl.controllers.PrimaryController;
 import sr.wat.edu.pl.controllers.StatusPanelController;
 import sr.wat.edu.pl.core.Logger;
@@ -35,7 +35,7 @@ public class RaSystem {
     private UDPMulticastServer udpMulticastServer;
     private UDPMulticastClient udpMulticastClient;
 
-    private List<Message> requests;
+    private ArrayList<Message> requests;
 
     public RaSystem() {
         nodes = new ArrayList<>();
@@ -51,6 +51,8 @@ public class RaSystem {
 
         udpMulticastServer = new UDPMulticastServer();
         udpMulticastClient = new UDPMulticastClient();
+
+        requests = new ArrayList<Message>() {};
     }
 
 
@@ -72,7 +74,7 @@ public class RaSystem {
         Message msg = new Message(MessageType.DISCOVER, localNode.getId());
 
         try {
-            nodeIds = udpMulticastClient.sendUDPMessageAndReceiveResponsedNodeIds(msg.toString(), MessageType.HELLO);
+            nodeIds = udpMulticastClient.sendUDPMessageAndReceiveHelloResponsedNodeIds(msg.toString(), MessageType.HELLO);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,11 +86,36 @@ public class RaSystem {
         }
     }
 
+    private void performListing() {
+        ArrayList<Message> requests = new ArrayList<>();
+
+        Message msg = new Message(MessageType.LIST_REQUEST, localNode.getId());
+
+        try {
+            requests = udpMulticastClient.sendUDPMessageAndReceiveListResponsedNodeIds(msg.toString(), MessageType.LIST_REPLY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (!requests.isEmpty()) {
+            this.requests = requests;
+            ArrayList<String> records = new ArrayList<>();
+
+            for (Message req : requests) {
+                records.add(String.format("T%d :: Node[%d]", req.getTimestamp(), req.getNodeId()));
+            }
+
+            PrimaryController.getInstance().addAllRequests(records);
+        }
+    }
+
 
     public void joinSystem() {
         Logger.log_info(this.getClass().getSimpleName(), "Joining system...");
 
         performDiscover();
+
+        performListing();
 
         if (nodes.isEmpty()) {
             localNode = new Node(1);
@@ -157,6 +184,10 @@ public class RaSystem {
         return builder.toString();
     }
 
+    public ArrayList<Message> getRequests() {
+        return requests;
+    }
+
     private boolean isLocalNodeInQueue() {
         for(Message request : requests) {
             if (request.getNodeId() == localNode.getId()) {
@@ -166,33 +197,32 @@ public class RaSystem {
         return false;
     }
 
-    public int handleRequest(Message request) {
-        boolean inserted = false;
+    public void handleRequest(Message request) {
+        Platform.runLater(() -> {
+            boolean inserted = false;
 
-        if (requests.isEmpty()) {
-            requests.add(request);
-            inserted = true;
-        } else {
-            for (Message req : requests) {
-                if (req.getTimestamp() > request.getTimestamp()) {
-                    requests.add(requests.indexOf(req), request);
-                    inserted = true;
+            if (requests.isEmpty()) {
+                requests.add(request);
+                inserted = true;
+            } else {
+                for (Message req : requests) {
+                    if (req.getTimestamp() > request.getTimestamp()) {
+                        requests.add(requests.indexOf(req), request);
+                        inserted = true;
+                    }
                 }
             }
-        }
-        if (!inserted) {
-            requests.add(requests.size(), request);
-        }
+            if (!inserted) {
+                requests.add(requests.size(), request);
+            }
 
-        PrimaryController.getInstance().addRequestsToList(requests.indexOf(request), String.format("T%d :: Node[%d]", request.getTimestamp(), request.getNodeId()));
+            PrimaryController.getInstance().addRequestToList(requests.indexOf(request), String.format("T%d :: Node[%d]", request.getTimestamp(), request.getNodeId()));
 
-        Logger.log_debug(this.getClass().getSimpleName(), "Requests: " + showRequests());
-
-        if (isLocalNodeInQueue()) {
-            return 1;
-        }
-        return 0;
+            Logger.log_debug(this.getClass().getSimpleName(), "Requests: " + showRequests());
+        });
     }
+
+
     /*
      * 
      * Getters and Setters

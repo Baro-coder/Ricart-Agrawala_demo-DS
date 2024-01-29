@@ -9,6 +9,8 @@ public class Message {
         DISCOVER,
         HELLO,
         BYE,
+        LIST_REQUEST,
+        LIST_REPLY,
         REQUEST,
         RESPONSE,
         HEALTHCHECK_REQUEST,
@@ -16,9 +18,9 @@ public class Message {
     }
 
 
-    private MessageType type;
-    private int nodeId;
-    private int timestamp;
+    protected MessageType type;
+    protected int nodeId;
+    protected int timestamp;
 
     public Message(MessageType type, int nodeId) {
         this.type = type;
@@ -37,6 +39,10 @@ public class Message {
     @Override
     public String toString() {
         return String.format("RA<<[%s]:[Node:%d|%d>>RA", type.name(), nodeId, timestamp);
+    }
+
+    public String shortInfo() {
+        return String.format("%d,%d", timestamp, nodeId);
     }
 
     public MessageType getType() {
@@ -62,10 +68,7 @@ public class Message {
             String datagramMsgTimestamp = datagramMsg.substring(_endIndex_timestamp + 1, datagramMsg.length() - 5);
 
             Logger.log_debug(Message.class.getSimpleName(), " Received Datagram : " + message);
-            Logger.log_debug(Message.class.getSimpleName(), "   - type : " + datagramMsgType);
-            Logger.log_debug(Message.class.getSimpleName(), "   - node : " + datagramMsgNodeId);
-            Logger.log_debug(Message.class.getSimpleName(), "   - time : " + datagramMsgTimestamp);
-
+            
             try {
                 MessageType msgType = MessageType.valueOf(datagramMsgType);
                 int nodeId = Integer.parseInt(datagramMsgNodeId);

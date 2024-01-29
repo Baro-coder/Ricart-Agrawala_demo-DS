@@ -8,13 +8,15 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
+import javafx.concurrent.Task;
 import sr.wat.edu.pl.core.Logger;
 import sr.wat.edu.pl.core.sys.RaSystem;
 import sr.wat.edu.pl.core.sys.com.Message.MessageType;
 
 
-public class UDPMulticastServer implements Runnable {
+public class UDPMulticastServer extends Task<Void> {
     private boolean isRunning;
 
     private String interfaceName;
@@ -31,7 +33,7 @@ public class UDPMulticastServer implements Runnable {
     }
 
     @Override
-    public void run() {
+    protected Void call() throws Exception {
         isRunning = true;
 
         InetAddress group = null;
@@ -54,7 +56,6 @@ public class UDPMulticastServer implements Runnable {
 
         try {
             // Create socket
-            
             socket = new MulticastSocket(port);
             socket.joinGroup(sockaddr, networkInterface);
             
@@ -87,24 +88,18 @@ public class UDPMulticastServer implements Runnable {
                                 responseType = MessageType.HELLO;
                             break;
                         case BYE:
+                                // remove node
                                 RaSystem.getInstance().removeNodeById(raMsg.getNodeId());
                             break;
-                        case HELLO:
-                                // ignore;
+                        case LIST_REQUEST:
+                                responseType = MessageType.LIST_REPLY;
                             break;
                         case HEALTHCHECK_REQUEST:
                                 // resend HEALTHCHECK_REPLY;
                                 responseType = MessageType.HEALTHCHECK_REPLY;
                             break;
-                        case HEALTHCHECK_REPLY:
-                                // ignore;
-                            break;
                         case REQUEST:
-                                // TODO: Check the list
-                                // -- send RESPONSE or ignore;
-                                if (RaSystem.getInstance().handleRequest(raMsg) == 0) {
-                                    responseType = MessageType.RESPONSE;
-                                }
+                                RaSystem.getInstance().handleRequest(raMsg);
                             break;
                         case RESPONSE:
                                 // TODO: Check the list
@@ -115,8 +110,17 @@ public class UDPMulticastServer implements Runnable {
                     }
 
                     if (responseType != null) {
-                        // Build response message
-                        String responseData = new Message(responseType, RaSystem.getInstance().getLocalNode().getId()).toString();
+                        String responseData = null;
+                        if (responseType == MessageType.LIST_REPLY) {
+                            ArrayList<Message> requests = RaSystem.getInstance().getRequests();
+                            responseData = new ListMessage(responseType, RaSystem.getInstance().getLocalNode().getId(), requests).toString();
+                        } else {
+                            // Build standard response message
+                            responseData = new Message(responseType, RaSystem.getInstance().getLocalNode().getId()).toString();
+                        }
+
+                        System.err.println(" [*] UDP Server : Response data : " + responseData);
+                        
                         byte[] responseBuffer = responseData.getBytes();
 
                         // Create packet to response
@@ -142,6 +146,7 @@ public class UDPMulticastServer implements Runnable {
             }
             Logger.log_info(this.getClass().getSimpleName(), String.format("Socket [%s:%d] closed.", address, port));
         }
+        return null;
     }
 
     public void start() {

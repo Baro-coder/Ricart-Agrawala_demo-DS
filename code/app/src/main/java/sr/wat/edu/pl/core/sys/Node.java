@@ -23,6 +23,11 @@ public class Node {
         this.state = state;
     }
 
+    @Override
+    public String toString() {
+        return String.format("Node[%d]", id);
+    }
+
 
     public int getId() {
         return id;
